@@ -37,7 +37,7 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
-// void callback(char* topic, byte* payload, unsigned int length) {
+void callback(char* topic, byte* payload, unsigned int length) {
 //   Serial.print("Message arrived [");
 //   Serial.print(topic);
 //   Serial.print("] ");
@@ -45,17 +45,8 @@ void setup_wifi() {
 //     Serial.print((char)payload[i]);
 //   }
 //   Serial.println();
-
-//   // Switch on the LED if an 1 was received as first character
-//   if ((char)payload[0] == '1') {
-//     digitalWrite(BUILTIN_LED, LOW);   // Turn the LED on (Note that LOW is the voltage level
-//     // but actually the LED is on; this is because
-//     // it is active low on the ESP-01)
-//   } else {
-//     digitalWrite(BUILTIN_LED, HIGH);  // Turn the LED off by making the voltage HIGH
-//   }
-
-// }
+	client.publish("Sensor/acs1", "Got your message");
+}
 
 void reconnect() {
   // Loop until we're reconnected
@@ -82,11 +73,11 @@ void reconnect() {
 }
 
 void setup() {
-  // pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
+  pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
   Serial.begin(115200);
   setup_wifi();
   client.setServer(mqtt_server, 1883);
-  // client.setCallback(callback);
+  client.setCallback(callback);
 }
 
 void loop() {
@@ -96,13 +87,9 @@ void loop() {
   }
   client.loop();
 
-  unsigned long now = millis();
-  if (now - lastMsg > 2000) {
-    lastMsg = now;
-    ++value;
-    snprintf (msg, MSG_BUFFER_SIZE, "Data sent #%ld", value);
-    Serial.print("Publish message: ");
-    Serial.println(msg);
-    client.publish("Sensor/acs1", msg);
-  }
+    // snprintf (msg, MSG_BUFFER_SIZE, "hello world");
+    // Serial.print("Publish message: ");
+    // Serial.println(msg);
+    client.publish("Sensor/acs1", "I am here");
+	client.subscribe("Sensor/acs1");
 }
