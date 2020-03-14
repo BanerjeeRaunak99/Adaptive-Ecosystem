@@ -45,7 +45,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
 //     Serial.print((char)payload[i]);
 //   }
 //   Serial.println();
-	client.publish("Sensor/acs1", "Got your message");
+  int data = (int)payload;
+  if (payload == 1) {
+	  client.publish("Sensor/acs1", "ACS Reading sent");
+  }
 }
 
 void reconnect() {

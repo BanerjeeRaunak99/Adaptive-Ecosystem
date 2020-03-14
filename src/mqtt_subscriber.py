@@ -1,3 +1,4 @@
+import time
 import paho.mqtt.client as mqtt
 
 job = "get:acs1"
@@ -11,18 +12,19 @@ def on_publish(user, userdata, rc):
 
 def on_connect(clients, userdata, flags, rc):
     print("Connected with code " + str(rc))
-    client.subscribe("Sensor/acs1")
-    client.publish("Sensor/acs1", "1")
+    if time.time() - start_time:
+        client.subscribe("nodemcu1/acs1")
+        client.publish("nodemcu1/acs1", "1")
 
     if job == "get:acs1":
-        client.subscribe("Sensor/"+job.split(":")[1])
-        client.publish("Sensor/"+job.split(":")[1], "send_data")
+        client.subscribe("nodemcu1/"+job.split(":")[1])
+        client.publish("nodemcu1/"+job.split(":")[1], "send_data")
         job = "none"
 
 
 def on_message(client, userdata, message):
     payload = message.payload.decode("utf-8")
-    print(payload)
+    print(payload, message.topic)
 
     # if payload == "Got your message":
     #     print("They got your message")
@@ -31,10 +33,15 @@ def on_message(client, userdata, message):
     # msg = payload.split(":")
     # TODO: Check for the sensor field of the msg and call suitable functions
 
+
+
+def main():
+    client.connect("localhost", 1883, 60)
+
+    client.loop_forever()
+
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
 
-client.connect("localhost", 1883, 60)
-
-client.loop_forever()
+start_time = time.time()
